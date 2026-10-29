@@ -15,6 +15,8 @@ namespace UniverseLib.UI.Panels
     {
         #region STATIC
 
+        public static bool UpdateMouseControls = true;
+
         /// <summary>Is a panel currently being resized?</summary>
         public static bool Resizing { get; internal set; }
 
@@ -29,6 +31,8 @@ namespace UniverseLib.UI.Panels
         protected internal static bool focusHandledThisFrame;
         protected internal static bool draggerHandledThisFrame;
         protected internal static bool wasAnyDragging;
+        
+        public static List<PanelManager> Instances = new();
 
         /// <summary>Force any current Resizing to immediately end.</summary>
         public static void ForceEndResize()
@@ -89,17 +93,19 @@ namespace UniverseLib.UI.Panels
         /// <summary>Invoked when the user clicks outside of all panels.</summary>
         public event Action OnClickedOutsidePanels;
 
-        protected readonly List<PanelBase> panelInstances = new();
+        public readonly List<PanelBase> panelInstances = new();
         protected readonly Dictionary<int, PanelBase> transformIDToUIPanel = new();
-        protected readonly List<PanelDragger> draggerInstances = new();
+        public readonly List<PanelDragger> draggerInstances = new();
 
         public PanelManager(UIBase owner)
         {
+            Instances.Add(this);
             Owner = owner;
             PanelHolder = UIFactory.CreateUIObject("PanelHolder", owner.RootObject);
             RectTransform rect = PanelHolder.GetComponent<RectTransform>();
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
+            
         }
 
         /// <summary>
@@ -114,7 +120,7 @@ namespace UniverseLib.UI.Panels
         /// <summary>
         /// The MousePosition which should be used for this PanelManager. By default, this is <see cref="InputManager.MousePosition"/>.
         /// </summary>
-        protected internal virtual Vector3 MousePosition
+        public virtual Vector3 MousePosition
         {
             get => InputManager.MousePosition;
         }
@@ -168,6 +174,20 @@ namespace UniverseLib.UI.Panels
 
             if (!draggerHandledThisFrame)
                 UpdateDraggers();
+                
+            var mousePos = MousePosition;
+            /*
+            if(UpdateMouseControls)
+            {
+                Debug.LogFormat("Internal updating controls: {0}", !panelInstances.Where(p => p.Enabled).Any(p => {
+                    var rect = p.Rect.rect;
+                    var point = p.Rect.InverseTransformPoint(mousePos);
+                    Debug.LogFormat("Rect of {0}: {1}, mouse pos: {2}, {3}, dragger contains: {4}", p.Name, rect.ToString(), point, rect.Contains(point), p.Dragger.HoveringDragger);
+                    return p.Dragger.HoveringDragger || p.Rect.rect.Contains(point);
+                }));
+                Universe.ToggleMouseControls(!panelInstances.Where(p => p.Enabled).Any(p => p.Dragger.HoveringDragger || p.Rect.rect.Contains(p.Rect.InverseTransformPoint(mousePos))));
+            }
+            */
         }
 
         protected virtual void UpdateFocus()

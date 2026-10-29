@@ -13,6 +13,7 @@ namespace UniverseLib.UI.Panels
         // Static
 
         private const int RESIZE_THICKNESS = 10;
+        public static Action<bool> SetCursor;
 
         // Instance
 
@@ -36,6 +37,8 @@ namespace UniverseLib.UI.Panels
         private Vector2 lastResizePos;
         private ResizeTypes lastResizeHoverType;
         private Rect totalResizeRect;
+        
+        public bool HoveringDragger;
 
         public PanelDragger(PanelBase uiPanel)
         {
@@ -54,6 +57,8 @@ namespace UniverseLib.UI.Panels
         
             Vector3 dragPos = DragableArea.InverseTransformPoint(rawMousePos);
             bool inDragPos = DragableArea.rect.Contains(dragPos);
+            
+            HoveringDragger = inResizePos || inDragPos;
         
             if (WasHoveringResize && PanelManager.resizeCursor)
                 UpdateHoverImagePos();
@@ -254,6 +259,7 @@ namespace UniverseLib.UI.Panels
 
             PanelManager.resizeCursorUIBase.Enabled = true;
             PanelManager.resizeCursor.SetActive(true);
+            SetCursor?.Invoke(true);
         
             // set the rotation for the resize icon
             float iconRotation = 0f;
@@ -291,6 +297,7 @@ namespace UniverseLib.UI.Panels
         {
             PanelManager.resizeCursorUIBase.Enabled = false;
             PanelManager.resizeCursor.SetActive(false);
+            SetCursor?.Invoke(false);
         }
         
         public virtual void OnBeginResize(ResizeTypes resizeType)

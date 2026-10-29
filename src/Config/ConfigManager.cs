@@ -37,7 +37,7 @@ namespace UniverseLib.Config
         public static bool Disable_EventSystem_Override { get; set; }
 
         /// <summary>If true, attempts to force-unlock the mouse (<see cref="UnityEngine.Cursor"/>) when a UniversalUI is in use.</summary>
-        public static bool Force_Unlock_Mouse { get; set; }
+        public static bool Force_Unlock_Mouse { get; set; } = true;
 
         /// <summary>For IL2CPP games, this should be the full path to a folder containing the Unhollowed assemblies.
         /// This property is only used during the intial startup process.</summary>

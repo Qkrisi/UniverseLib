@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+﻿using HarmonyXLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,6 +35,8 @@ namespace UniverseLib
         public const string VERSION = "1.5.1";
         public const string AUTHOR = "Sinai";
         public const string GUID = "com.sinai.universelib";
+        
+        public static Action<bool> ToggleMouseControls;
 
         /// <summary>The current runtime context (Mono or IL2CPP).</summary>
         public static RuntimeContext Context { get; } =

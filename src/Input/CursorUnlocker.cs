@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+﻿using HarmonyXLib;
 using System;
 using System.Collections;
 using System.Linq;
@@ -23,6 +23,8 @@ namespace UniverseLib.Input
         /// True if a UI is being displayed and <see cref="ConfigManager.Force_Unlock_Mouse"/> is true.
         /// </summary>
         public static bool ShouldUnlock => ConfigManager.Force_Unlock_Mouse && UniversalUI.AnyUIShowing;
+        
+        public static bool ForceDisableCursor;
 
         private static bool currentlySettingCursor;
         private static CursorLockMode lastLockMode;
@@ -76,7 +78,7 @@ namespace UniverseLib.Input
                 if (ShouldUnlock)
                 {
                     Cursor.lockState = CursorLockMode.None;
-                    Cursor.visible = true;
+                    Cursor.visible = ForceDisableCursor ? false : true;
 
                     if (!ConfigManager.Disable_EventSystem_Override)
                         EventSystemHelper.EnableEventSystem();
@@ -84,7 +86,7 @@ namespace UniverseLib.Input
                 else
                 {
                     Cursor.lockState = lastLockMode;
-                    Cursor.visible = lastVisibleState;
+                    Cursor.visible = ForceDisableCursor ? false : lastVisibleState;
 
                     if (!ConfigManager.Disable_EventSystem_Override)
                         EventSystemHelper.ReleaseEventSystem();
@@ -119,6 +121,8 @@ namespace UniverseLib.Input
 
         internal static void Prefix_set_lockState(ref CursorLockMode value)
         {
+            if(ForceDisableCursor)
+                return;
             try
             {
                 if (!currentlySettingCursor)
@@ -134,6 +138,8 @@ namespace UniverseLib.Input
 
         internal static void Prefix_set_visible(ref bool value)
         {
+            if(ForceDisableCursor)
+                return;
             try
             {
                 if (!currentlySettingCursor)
